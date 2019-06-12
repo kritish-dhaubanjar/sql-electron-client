@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>JinSQL</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="semantic/dist/semantic.min.css"
+    />
+    <link rel="stylesheet" type="text/css" href="assets/css/styles.css" />
+  </head>
+
+  <body>
+    <div id="tables" class="ui vertical pointing menu"></div>
+    <div id="rows">
+      <table
+        class="ui collapsing striped fixed single line celled table selectable"
+      >
+        <thead>
+          <tr></tr>
+        </thead>
+        <tbody>
+          <tr></tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="sql">
+      <div class="ui form error success">
+        <div class="field">
+          <label><i class="server icon"></i>SQL</label>
+          <textarea rows="2"></textarea>
+        </div>
+        <button class="ui primary button">
+          <i class="play icon"></i>
+          SQL Query
+        </button>
+        <button class="ui red button">
+          <i class="plug icon"></i>
+          Disconnect
+        </button>
+        <div class="ui error message"></div>
+        <div class="ui success message"></div>
+      </div>
+    </div>
+    <script>
+      const jQuery = require("jquery");
+      const $ = jQuery;
+      require("./semantic/dist/semantic.min");
+    </script>
+    <script>
+      const { ipcRenderer } = require("electron");
+
+      $(".ui.primary.button").on("click", () => {
+        let sqlStatement = $("textarea")[0].value;
+        ipcRenderer.send("database:sql", sqlStatement);
+      });
+
+      $(".ui.red.button").on("click", () => {
+        ipcRenderer.send("database:disconnect");
+      });
+
+      ipcRenderer.on("database:tables", (event, payload) => {
+        ipcRenderer.send("database:query", Object.values(payload[0])[0]);
+
+        payload.forEach(element => {
+          let a = document.createElement("a");
+          a.className = "item";
+
+          a.textContent = Object.values(element)[0];
+          let i = document.createElement("i");
+          i.className = "grid layout icon";
+          a.appendChild(i);
+
+          a.addEventListener("click", function() {
+            ipcRenderer.send("database:query", a.text);
+            $("a").removeClass("active");
+            a.classList.add("active");
+          });
+
+          $(".ui.pointing.vertical.menu").append(a);
+        });
+      });
+
+      ipcRenderer.on("database:results", (event, payload) => {
+        $("thead tr").empty("th");
+        $("tbody").empty("tr");
+
+        keys = Object.keys(payload[0]);
+        keys.forEach(header => {
+          let th = document.createElement("th");
+          th.innerText = header;
+          $("thead tr").append(th);
+        });
+
+        payload.forEach(row => {
+          values = Object.values(row);
+          let tr = document.createElement("tr");
+          tr.addEventListener("click", () => {
+            console.log(tr);
+          });
+          values.forEach(value => {
+            let td = document.createElement("td");
+            td.innerText = value;
+            tr.appendChild(td);
+            $("tbody").append(tr);
+          });
+        });
+      });
+
+      ipcRenderer.on("database:error", (events, payload) => {
+        $(".ui.success.message").text("");
+        $(".ui.error.message").text(payload.message);
+      });
+
+      ipcRenderer.on("database:success", (events, payload) => {
+        $(".ui.error.message").text("");
+        $(".ui.success.message").text(payload);
+      });
+    </script>
+  </body>
+</html>

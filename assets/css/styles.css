@@ -1,0 +1,60 @@
+* {
+  font-size: 0.95rem;
+}
+
+#auth {
+  padding-left: 8rem;
+  padding-right: 8rem;
+  padding-top: 2rem;
+}
+
+#tables {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 20%;
+}
+
+#rows {
+  position: absolute;
+  width: 80%;
+  height: 50%;
+  top: 0;
+  right: 0;
+  overflow-y: scroll;
+  border-bottom: 1px solid #e3e3e3;
+}
+#sql {
+  position: absolute;
+  width: 80%;
+  height: 50%;
+  bottom: 0;
+  right: 0;
+  padding: 0.5rem;
+  /* border-bottom: 1px solid #e3e3e3; */
+}
+
+#sql label {
+  font-size: 1rem;
+  padding: 0.4rem;
+}
+
+#sql button {
+  font-size: 0.9rem;
+}
+
+#sql textarea {
+  padding: 0.5rem;
+  font-family: monospace;
+}
+
+.menu {
+  border-radius: 0 !important;
+}
+table {
+  border-left: 0 !important;
+  border-radius: 0 !important;
+}

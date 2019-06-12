@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>JinSQL</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="semantic/dist/semantic.min.css"
+    />
+    <link rel="stylesheet" type="text/css" href="assets/css/styles.css" />
+  </head>
+  <body>
+    <div id="auth" class="ui container">
+      <form class="ui form error">
+        <div class="field">
+          <label>Host</label>
+          <input
+            type="text"
+            name="host"
+            placeholder="127.0.0.1"
+            value="127.0.0.1"
+          />
+        </div>
+        <div class="field">
+          <label>Port</label>
+          <input type="text" name="port" placeholder="3306" value="3306" />
+        </div>
+        <div class="field">
+          <label>User</label>
+          <input type="text" name="user" placeholder="root" value="root" />
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input type="password" name="password" placeholder="toor" />
+        </div>
+        <div class="field">
+          <label>Database</label>
+          <input type="text" name="database" placeholder="homestead" />
+        </div>
+        <button class="ui primary button" type="submit">
+          <i class="plug icon"></i>Connect
+        </button>
+        <div class="ui error message"></div>
+      </form>
+    </div>
+    <script>
+      const jQuery = require("jquery");
+      const $ = jQuery;
+      require("./semantic/dist/semantic.min");
+    </script>
+
+    <script>
+      const { ipcRenderer } = require("electron");
+
+      ipcRenderer.on("database:error", (event, payload) => {
+        console.log(payload.message);
+        $(".ui.error.message").text(payload.message);
+        $("button").removeClass("loading");
+      });
+
+      $("button").on("click", e => {
+        e.preventDefault();
+        $("button").addClass("loading");
+        payload = {};
+        $("form :input").each((index, value) => {
+          payload[value.name] = value.value;
+        });
+
+        ipcRenderer.send("database:connect", payload);
+      });
+
+      ipcRenderer.on("database:config", (event, payload) => {
+        $("input[name='host']").val(payload.host);
+        $("input[name='port']").val(payload.port);
+        $("input[name='user']").val(payload.user);
+        $("input[name='password']").val(payload.password);
+        $("input[name='database']").val(payload.database);
+        $("input[name='database']").val(payload.database);
+      });
+    </script>
+  </body>
+</html>
